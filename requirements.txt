@@ -37,7 +37,6 @@ py==1.9.0
 pycel==1.0b22
 pyinstaller==4.0
 pyinstaller-hooks-contrib==2020.9
-pyodbc==4.0.30
 pyparsing==2.4.7
 pytest==5.3.5
 pytest-django==3.8.0
