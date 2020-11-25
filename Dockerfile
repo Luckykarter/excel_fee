@@ -4,7 +4,7 @@ RUN mkdir /code
 WORKDIR /code
 COPY requirements.txt /code/
 COPY excelfee/pycel /code/
-RUN pip install pycel --find-links /excelfee/pycel/
+RUN pip install pycel --find-links /code/excelfee/pycel/
 RUN pip install -r requirements.txt
 COPY . /code/
 
