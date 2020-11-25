@@ -42,6 +42,7 @@ urlpatterns = [
     path("doka/excel/", include("excelfee.urls")),
     path("accounts/login/", death_star.views.login),
     path("accounts/logout/", death_star.views.logout),
+    path("", death_star.views.login),
 
     url(r'^swagger(?P<format>\.json|\.yaml)$', schema_view.without_ui(cache_timeout=0), name='schema-json'),
     url(r'^swagger/$', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
