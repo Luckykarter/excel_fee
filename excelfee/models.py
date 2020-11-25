@@ -111,3 +111,5 @@ class CalcResult(models.Model):
 
     excel = models.ForeignKey(ExcelFile, on_delete=models.CASCADE,
                               help_text='File used for calculation')
+
+

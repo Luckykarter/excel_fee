@@ -9,16 +9,23 @@ import excelfee.models as models
 import base64
 import os
 import openpyxl
-from django.core.serializers import serialize
 
 
-def _err(e):
+def _err(e=None):
+    if e is None:
+        e = "description of the error"
     return {'error': str(e)}
+
+
+def _get_examples(e):
+    return {
+        "application/json": e
+    }
 
 
 @swagger_auto_schema(
     methods=['POST'],
-    operation_id='Calculate_fee',
+    operation_id='calculate_fee',
     operation_description='Calculate fee using MS Excel file\n'
                           'Update Excel cells with the values from JSON (array cells) '
                           'and get result as a calculated fee. Updated Excel file handled in-memory\n'
@@ -26,9 +33,11 @@ def _err(e):
     request_body=serializers.InputDataSerializer,
     # request_body=serializers.InputDataSerializer,
     responses={200: openapi.Response('OK', serializers.CalcResultSerializer),
-               404: openapi.Response('Excel file not found',
-                                     examples={"error": "[Errno 2] No such file or directory: FeeCalcDemo.xlsx'"}),
-               500: openapi.Response('Calculation failed', examples={'error': 'description of the error'})})
+               404: openapi.Response('Excel file not found', serializers.ErrorSerializer,
+                                     examples=_get_examples(
+                                         _err("[Errno 2] No such file or directory: FeeCalcDemo.xlsx"))),
+               500: openapi.Response('Calculation failed', serializers.ErrorSerializer,
+                                     examples=_get_examples(_err()))})
 @api_view(['POST'])
 def calculate_fee(request):
     try:
@@ -39,9 +48,7 @@ def calculate_fee(request):
 
         excel_file = excel_file[0]
         excel = ExcelHandler(excel_file.filepath)
-        # input_data = models.InputData(**request.data)
         input_data = models.InputDataGeneric(**request.data)
-        # result = excel.calculate_fee(input_data, excel_file)
         result = excel.calculate_fee_generic(input_data, excel_file)
         return Response(serializers.CalcResultSerializer(result).data,
                         status=status.HTTP_200_OK)
@@ -59,14 +66,15 @@ def calculate_fee(request):
     operation_id='show_files',
     operation_description='Display all currently loaded files',
     responses={200: openapi.Response('OK', serializers.ExcelSerializer),
-               404: openapi.Response('Excel file not found',
-                                     examples={"error": "[Errno 2] No such file or directory: FeeCalcDemo.xlsx'"}),
+               404: openapi.Response('Excel file not found', serializers.ErrorSerializer,
+                                     examples=_get_examples(
+                                         _err("[Errno 2] No such file or directory: FeeCalcDemo.xlsx"))),
                })
 @api_view(['GET'])
 def show_files(request):
     files = models.ExcelFile.objects.order_by('purpose', 'filename', '-version')
     if not files:
-        return Response({'error': 'No loaded Excel files'},
+        return Response(_err('No loaded Excel files'),
                         status=status.HTTP_404_NOT_FOUND)
 
     return Response(serializers.ExcelSerializer(files, many=True).data,
@@ -79,8 +87,10 @@ def show_files(request):
     operation_description='Upload MS Excel file',
     request_body=serializers.LoadExcelSerializer,
     responses={200: openapi.Response('File Uploaded Successfully', serializers.ExcelSerializer),
-               400: openapi.Response('Bad Request', examples=_err('content missing')),
-               500: openapi.Response('Error uploading Excel', examples=_err('description of the error'))})
+               400: openapi.Response('Bad Request', serializers.ErrorSerializer,
+                                     examples=_get_examples(_err('content missing'))),
+               500: openapi.Response('Error uploading Excel', serializers.ErrorSerializer,
+                                     examples=_get_examples(_err('description of the error')))})
 @api_view(['POST'])
 def upload_excel(request):
     try:
@@ -152,10 +162,12 @@ SUPPORTED_PROPERTIES = {
     operation_id='get_file_property',
     operation_description='Returns given property of the given Excel filename. Supported properties:\n'
                           f'{" ".join(SUPPORTED_PROPERTIES)}',
-    responses={200: openapi.Response('OK', examples={'property': 'value'}),
-               400: openapi.Response('Bad Request'),
-               404: openapi.Response('Excel file not found',
-                                     examples={"error": "[Errno 2] No such file or directory: FeeCalcDemo.xlsx'"}),
+    responses={200: openapi.Response('OK', serializers.PropertySerializer,
+                                     examples=_get_examples({'property_name': 'value'})),
+               400: openapi.Response('Bad Request', serializers.ErrorSerializer, examples=_get_examples(_err())),
+               404: openapi.Response('Excel file not found', serializers.ErrorSerializer,
+                                     examples=_get_examples(
+                                         _err("[Errno 2] No such file or directory: FeeCalcDemo.xlsx"))),
                })
 @api_view(['GET'])
 def get_property(request, **kwargs):
@@ -182,4 +194,3 @@ def get_property(request, **kwargs):
         return Response({'sheetnames': book.sheetnames}, status=status.HTTP_200_OK)
     elif property == 'content':
         return Response({'content': file.content}, status=status.HTTP_200_OK)
-
