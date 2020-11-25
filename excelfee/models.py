@@ -82,7 +82,6 @@ class Cell(models.Model, models.Field):
                                         help_text='Optional textual description of the Excel cell',
                                         default='')
 
-    excel = models.ForeignKey(ExcelFile, on_delete=models.CASCADE)
 
     @property
     def value(self):
@@ -93,6 +92,9 @@ class InputDataGeneric(models.Model):
     class Meta:
         managed = False
 
+    filename = models.CharField(name="filename",
+                                help_text='Excel filename to use for calculation',
+                                max_length=255)
     cells = Cell('cell')
 
 

@@ -8,21 +8,11 @@ class ExcelPurposeSerializer(ModelSerializer):
         exclude = ['id']
 
 class CellSerializer(ModelSerializer):
-    purpose = ExcelPurposeSerializer()
+    # purpose = ExcelPurposeSerializer()
 
     class Meta:
         model = models.Cell
         fields = '__all__'
-
-
-class InputDataSerializer(ModelSerializer):
-    cells = CellSerializer(many=True)
-
-    class Meta:
-        # model = models.InputData
-        model = models.InputDataGeneric
-        fields = '__all__'
-
 
 
 class LoadExcelSerializer(ModelSerializer):
@@ -40,6 +30,14 @@ class ExcelSerializer(ModelSerializer):
         model = models.ExcelFile
         fields = ['purpose', 'filename', 'version', 'timestamp', 'sheetnames']
 
+
+class InputDataSerializer(ModelSerializer):
+    cells = CellSerializer(many=True)
+
+    class Meta:
+        # model = models.InputData
+        model = models.InputDataGeneric
+        fields = '__all__'
 
 class CalcResultSerializer(ModelSerializer):
     excel = ExcelSerializer()

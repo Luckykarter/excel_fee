@@ -20,8 +20,9 @@ def _err(e):
     methods=['POST'],
     operation_id='Calculate_fee',
     operation_description='Calculate fee using MS Excel file\n'
-                          'Update Excel cells with the values from JSON (array cells)'
-                          'and get result as a calculated fee',
+                          'Update Excel cells with the values from JSON (array cells) '
+                          'and get result as a calculated fee. Updated Excel file handled in-memory\n'
+                          'To update/upload new Excel - use endpoint upload_excel',
     request_body=serializers.InputDataSerializer,
     # request_body=serializers.InputDataSerializer,
     responses={200: openapi.Response('OK', serializers.CalcResultSerializer),
@@ -31,14 +32,10 @@ def _err(e):
 @api_view(['POST'])
 def calculate_fee(request):
     try:
-        purpose = models.ExcelPurpose.objects.filter(purpose='F', target='GICX')
-        if not purpose:
-            raise FileNotFoundError('Excel purpose not found')
-        purpose = purpose[0]
-
-        excel_file = models.ExcelFile.objects.filter(purpose=purpose).order_by('-version')
+        filename = request.data.get('filename')
+        excel_file = models.ExcelFile.objects.filter(filename__iexact=filename)
         if not excel_file:
-            raise FileNotFoundError('Excel file for purpose F not found')
+            raise FileNotFoundError(f'Excel file {filename} not found')
 
         excel_file = excel_file[0]
         excel = ExcelHandler(excel_file.filepath)
