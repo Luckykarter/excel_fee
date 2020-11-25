@@ -38,7 +38,7 @@ schema_view = get_schema_view(
 urlpatterns = [
     path("admin/", admin.site.urls),
     # path("exhaust_port/", include("exhaust_port.urls")),
-    # path("doka/test_autogen/", include("test_autogen.urls")),
+    path("doka/test_autogen/", include("test_autogen.urls")),
     path("doka/excel/", include("excelfee.urls")),
     path("accounts/login/", death_star.views.login),
     path("accounts/logout/", death_star.views.logout),
