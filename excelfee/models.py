@@ -1,7 +1,6 @@
 from rest_framework import serializers
 from django.db import models
 import os
-from django.contrib.postgres.fields import ArrayField
 
 
 class InputData(models.Model):
@@ -40,7 +39,7 @@ class InputDataGeneric(models.Model):
     class Meta:
         managed = False
 
-    cells = ArrayField(Cell('cell'))
+    cells = Cell('cell')
 
 
 class ExcelPurpose(models.Model):
