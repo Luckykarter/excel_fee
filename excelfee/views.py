@@ -121,7 +121,11 @@ def upload_excel(request):
     try:
         file_content = base64.b64decode(excel_file.content)
         excel_file.filename = excel_file.get_filename()
-        filename = os.path.join('data', excel_file.filename)
+        folder = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data')
+        if not os.path.exists(folder):
+            os.mkdir(folder)
+
+        filename = os.path.join(folder, excel_file.filename)
         filename = os.path.join(os.path.dirname(os.path.abspath(__file__)), filename)
         excel_file.filepath = filename
 
