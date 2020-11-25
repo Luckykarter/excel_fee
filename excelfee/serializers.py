@@ -2,8 +2,14 @@ from rest_framework.serializers import ModelSerializer
 import rest_framework.serializers as serializers
 import excelfee.models as models
 
+class ExcelPurposeSerializer(ModelSerializer):
+    class Meta:
+        model = models.ExcelPurpose
+        exclude = ['id']
 
 class CellSerializer(ModelSerializer):
+    purpose = ExcelPurposeSerializer()
+
     class Meta:
         model = models.Cell
         fields = '__all__'
@@ -17,11 +23,6 @@ class InputDataSerializer(ModelSerializer):
         model = models.InputDataGeneric
         fields = '__all__'
 
-
-class ExcelPurposeSerializer(ModelSerializer):
-    class Meta:
-        model = models.ExcelPurpose
-        exclude = ['id']
 
 
 class LoadExcelSerializer(ModelSerializer):
@@ -48,7 +49,7 @@ class CalcResultSerializer(ModelSerializer):
         fields = '__all__'
 
 class ArraySerializer(serializers.Serializer):
-    f = 'test'
+
     class Meta:
         field = serializers.StringRelatedField()
 

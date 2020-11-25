@@ -17,31 +17,6 @@ class InputData(models.Model):
                                help_text="Risk amount - fee calculation base")
 
 
-class Cell(models.Model, models.Field):
-    class Meta:
-        managed = False
-
-    sheet = models.TextField(name='sheet', help_text='Name of the Excel sheet to work with')
-    cell = models.TextField(name='cell', help_text='Cell coordinates (e.g. A1, B2, etc)')
-    value_type = models.TextField(name='value_type', choices=[('T', 'Text'), ('N', 'Numeric')])
-    value_text = models.TextField(name='value_text', help_text='Value of text cell', default='')
-    value_numeric = models.FloatField(name='value_numeric', help_text='Value of numeric cell', default=0.0)
-    text_description = models.TextField(name='text_description',
-                                        help_text='Optional textual description of the Excel cell',
-                                        default='')
-
-    @property
-    def value(self):
-        return self.value_text if self.value_type == 'T' else self.value_numeric
-
-
-class InputDataGeneric(models.Model):
-    class Meta:
-        managed = False
-
-    cells = Cell('cell')
-
-
 class ExcelPurpose(models.Model):
     PURPOSES = {
         'F': 'Fee calculation'
@@ -73,7 +48,6 @@ class ExcelFile(models.Model):
     timestamp = models.DateTimeField(name='timestamp', auto_now=True,
                                      help_text='Auto-generated timestamp when file uploaded')
 
-
     filepath = models.FilePathField(name='filepath',
                                     path=os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data'))
 
@@ -85,7 +59,6 @@ class ExcelFile(models.Model):
     sheetnames = models.TextField(name='sheetnames', default='',
                                   help_text='List of sheet names from uploaded Excel')
 
-
     def get_filename(self):
         return "_".join((
             self.purpose.purpose,
@@ -94,6 +67,33 @@ class ExcelFile(models.Model):
 
     def __str__(self):
         return self.get_filename()
+
+
+class Cell(models.Model, models.Field):
+    class Meta:
+        managed = False
+
+    sheet = models.TextField(name='sheet', help_text='Name of the Excel sheet to work with')
+    cell = models.TextField(name='cell', help_text='Cell coordinates (e.g. A1, B2, etc)')
+    value_type = models.TextField(name='value_type', choices=[('T', 'Text'), ('N', 'Numeric')])
+    value_text = models.TextField(name='value_text', help_text='Value of text cell', default='')
+    value_numeric = models.FloatField(name='value_numeric', help_text='Value of numeric cell', default=0.0)
+    text_description = models.TextField(name='text_description',
+                                        help_text='Optional textual description of the Excel cell',
+                                        default='')
+
+    excel = models.ForeignKey(ExcelFile, on_delete=models.CASCADE)
+
+    @property
+    def value(self):
+        return self.value_text if self.value_type == 'T' else self.value_numeric
+
+
+class InputDataGeneric(models.Model):
+    class Meta:
+        managed = False
+
+    cells = Cell('cell')
 
 
 class CalcResult(models.Model):
