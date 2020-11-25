@@ -42,7 +42,7 @@ INSTALLED_APPS = [
     # "apisure_guarantee.apps.GuaranteeConfig",
     # "corsheaders",
     'drf_yasg',
-    # "test_autogen.apps.TestAutogenConfig",
+    "test_autogen.apps.TestAutogenConfig",
     'excelfee.apps.ExcelfeeConfig',
 ]
 
