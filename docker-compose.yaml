@@ -1,0 +1,10 @@
+version: '3.1'
+
+services:
+  apisureserver:
+    build: .
+    restart: always
+    container_name: doka
+    ports:
+      - 80:80
+    working_dir: /code

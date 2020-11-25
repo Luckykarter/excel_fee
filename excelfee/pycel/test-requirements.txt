@@ -1,0 +1,8 @@
+tox                    # put this first so it can drive package versions
+codecov
+flake8-import-order
+pytest
+pytest-cov
+pytest-flake8
+restructuredtext-lint
+tox-travis
