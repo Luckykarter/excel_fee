@@ -40,7 +40,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     # "exhaust_port.apps.ExhaustPortConfig",
     # "apisure_guarantee.apps.GuaranteeConfig",
-    "corsheaders",
+    # "corsheaders",
     'drf_yasg',
     # "test_autogen.apps.TestAutogenConfig",
     'excelfee.apps.ExcelfeeConfig',
@@ -69,17 +69,17 @@ ROOT_URLCONF = "death_star.urls"
 
 CORS_ALLOW_ALL_ORIGINS = True
 
-CORS_ALLOW_HEADERS = [
-    'accept',
-    'accept-encoding',
-    'authorization',
-    'content-type',
-    'dnt',
-    'origin',
-    'user-agent',
-    'x-csrftoken',
-    'x-requested-with',
-]
+# CORS_ALLOW_HEADERS = [
+#     'accept',
+#     'accept-encoding',
+#     'authorization',
+#     'content-type',
+#     'dnt',
+#     'origin',
+#     'user-agent',
+#     'x-csrftoken',
+#     'x-requested-with',
+# ]
 
 
 TEMPLATES = [
