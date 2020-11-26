@@ -85,14 +85,15 @@ class ExcelHandler:
                     names = False
                     t = 'T'
                     if c < len(cols) - 1:
-                        if cols[c + 1][n].data_type == 'n':
+                        tar_cell = cols[c + 1][n]
+                        if tar_cell.data_type == 'n':
                             t = 'N'
 
-                    cells.append({
-                        'cell': cell.value,
-                        'type': t,
-                        'coordinate': cell.coordinate,
-                    })
+                        cells.append({
+                            'cell': cell.value,
+                            'type': t,
+                            'coordinate': tar_cell.coordinate,
+                        })
 
             result[sheet_name] = cells
 
