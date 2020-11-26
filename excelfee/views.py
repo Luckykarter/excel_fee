@@ -67,7 +67,10 @@ def calculate_fee(request):
     operation_description='Calculate cells using MS Excel file\n'
                           'Update Excel cells with the values from JSON (array cells) '
                           'and get result as a calculated cells. Updated Excel file handled in-memory\n'
-                          'To update/upload new Excel - use endpoint upload_excel',
+                          'To update/upload new Excel - use endpoint upload_excel\n\n'
+                          'Input JSON object contains cells with values that should be populated\n'
+                          'Output JSON object contains pointers to the cells that have to be returned as'
+                          'calculation answer',
     request_body=serializers.InputSerializer,
     responses={200: openapi.Response('OK', serializers.InputDataSerializer),
                404: openapi.Response('Excel file not found', serializers.ErrorSerializer,
