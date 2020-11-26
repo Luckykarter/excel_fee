@@ -83,15 +83,11 @@ class ExcelHandler:
                     if cell.value is None:
                         continue
                     names = False
-                    t = 'T'
                     if c < len(cols) - 1:
                         tar_cell = cols[c + 1][n]
-                        if tar_cell.data_type == 'n':
-                            t = 'N'
-
                         cells.append({
                             'cell': cell.value,
-                            'type': t,
+                            'type': 'N' if tar_cell.data_type == 'n' else 'T',
                             'coordinate': tar_cell.coordinate,
                         })
 
