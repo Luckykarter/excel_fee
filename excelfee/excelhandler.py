@@ -5,8 +5,8 @@ import os
 
 
 class ExcelHandler:
-
     BASE_PATH = os.path.dirname(os.path.abspath(__file__))
+
     # FILE = os.path.join(BASE_PATH, "data\\FeeCalcDemo.xlsx")
 
     def __init__(self, file):
@@ -65,4 +65,36 @@ class ExcelHandler:
 
         return result
 
+    @property
+    def get_cells(self):
+        result = {}
+
+        for i, sheet_name in enumerate(self.book.sheetnames):
+            sheet = self.book.worksheets[i]
+            names = True
+            cells = []
+            cols = [col for col in sheet.iter_cols()]
+            for c, col in enumerate(cols):
+                if not names:
+                    names = True
+                    continue
+
+                for n, cell in enumerate(col):
+                    if cell.value is None:
+                        continue
+                    names = False
+                    t = 'T'
+                    if c < len(cols) - 1:
+                        if cols[c + 1][n].data_type == 'n':
+                            t = 'N'
+
+                    cells.append({
+                        'cell': cell.value,
+                        'type': t,
+                        'coordinate': cell.coordinate,
+                    })
+
+            result[sheet_name] = cells
+
+        return result
 

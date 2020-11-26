@@ -153,7 +153,7 @@ def upload_excel(request):
 
 
 SUPPORTED_PROPERTIES = {
-    'content', 'sheetnames'
+    'content', 'sheetnames', 'cells'
 }
 
 
@@ -161,9 +161,9 @@ SUPPORTED_PROPERTIES = {
     methods=['GET'],
     operation_id='get_file_property',
     operation_description='Returns given property of the given Excel filename. Supported properties:\n'
-                          f'{" ".join(SUPPORTED_PROPERTIES)}',
+                          '{}'.format("\n".join(SUPPORTED_PROPERTIES)),
     responses={200: openapi.Response('OK', serializers.PropertySerializer,
-                                     examples=_get_examples({'property_name': 'value'})),
+                                     examples=_get_examples({'property_name': ['value']})),
                400: openapi.Response('Bad Request', serializers.ErrorSerializer, examples=_get_examples(_err())),
                404: openapi.Response('Excel file not found', serializers.ErrorSerializer,
                                      examples=_get_examples(
@@ -173,13 +173,14 @@ SUPPORTED_PROPERTIES = {
 def get_property(request, **kwargs):
     filename = kwargs.get('filename')
     property = kwargs.get('property')
+    property = property.lower()
     if not filename:
         return Response(_err("filename is empty"), status=status.HTTP_400_BAD_REQUEST)
 
     if not property:
         return Response(_err("property is empty"), status=status.HTTP_400_BAD_REQUEST)
 
-    file = models.ExcelFile.objects.get(filename=filename)
+    file = models.ExcelFile.objects.get(filename__iexact=filename)
     if not file:
         return Response(_err(f"file {filename} not found"), status=status.HTTP_404_NOT_FOUND)
 
@@ -194,3 +195,6 @@ def get_property(request, **kwargs):
         return Response({'sheetnames': book.sheetnames}, status=status.HTTP_200_OK)
     elif property == 'content':
         return Response({'content': file.content}, status=status.HTTP_200_OK)
+    elif property == 'cells':
+        excel = ExcelHandler(file.filepath)
+        return Response(excel.get_cells, status=status.HTTP_200_OK)

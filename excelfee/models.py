@@ -82,7 +82,6 @@ class Cell(models.Model, models.Field):
                                         help_text='Optional textual description of the Excel cell',
                                         default='')
 
-
     @property
     def value(self):
         return self.value_text if self.value_type == 'T' else self.value_numeric
@@ -111,5 +110,3 @@ class CalcResult(models.Model):
 
     excel = models.ForeignKey(ExcelFile, on_delete=models.CASCADE,
                               help_text='File used for calculation')
-
-

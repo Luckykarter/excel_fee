@@ -67,4 +67,4 @@ class ErrorSerializer(serializers.Serializer):
 
 
 class PropertySerializer(serializers.Serializer):
-    property_name = serializers.StringRelatedField()
+    property_name = serializers.StringRelatedField(many=True)
