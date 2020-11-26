@@ -62,6 +62,54 @@ def calculate_fee(request):
 
 
 @swagger_auto_schema(
+    methods=['POST'],
+    operation_id='calculate',
+    operation_description='Calculate cells using MS Excel file\n'
+                          'Update Excel cells with the values from JSON (array cells) '
+                          'and get result as a calculated cells. Updated Excel file handled in-memory\n'
+                          'To update/upload new Excel - use endpoint upload_excel',
+    request_body=serializers.InputSerializer,
+    responses={200: openapi.Response('OK', serializers.InputDataSerializer),
+               404: openapi.Response('Excel file not found', serializers.ErrorSerializer,
+                                     examples=_get_examples(
+                                         _err("[Errno 2] No such file or directory: FeeCalcDemo.xlsx"))),
+               500: openapi.Response('Calculation failed', serializers.ErrorSerializer,
+                                     examples=_get_examples(_err()))})
+@api_view(['POST'])
+def calculate(request):
+    try:
+        filename = request.data.get('filename')
+        excel_file = models.ExcelFile.objects.filter(filename__iexact=filename)
+        if not excel_file:
+            raise FileNotFoundError(f'Excel file {filename} not found')
+
+        excel_file = excel_file[0]
+        excel = ExcelHandler(excel_file.filepath)
+
+        input_ = request.data.pop('input')
+        output_ = request.data.pop('output')
+
+        input_data = models.Input(**request.data)
+        input_data.input = [models.Cell(**x) for x in input_.get('cells')]
+        input_data.output = [models.Cell(**x) for x in output_.get('cells')]
+
+        # input_json = request.data.get('input')
+        # output_json = request.data.get('output')
+        result = excel.calculate(input_data, excel_file)
+
+        return Response(serializers.InputDataSerializer(result).data,
+                        status=status.HTTP_200_OK)
+    except FileNotFoundError as e:
+        return Response({'error': str(e)},
+                        status=status.HTTP_404_NOT_FOUND)
+
+    except Exception as e:
+        return Response({'error': str(e)},
+                        status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+
+@swagger_auto_schema(
     methods=['GET'],
     operation_id='show_files',
     operation_description='Display all currently loaded files',

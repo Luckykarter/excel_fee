@@ -41,6 +41,23 @@ class InputDataSerializer(ModelSerializer):
         model = models.InputDataGeneric
         fields = '__all__'
 
+class InputSerializer(ModelSerializer):
+    input = CellSerializer(many=True)
+    output = CellSerializer(many=True)
+
+    class Meta:
+        # model = models.InputData
+        model = models.Input
+        fields = '__all__'
+
+# class OutputSerializer(ModelSerializer):
+#     cells = CellSerializer(many=True)
+#
+#     class Meta:
+#         # model = models.InputData
+#         model = models.Output
+#         fields = '__all__'
+
 
 class CalcResultSerializer(ModelSerializer):
     excel = ExcelSerializer()

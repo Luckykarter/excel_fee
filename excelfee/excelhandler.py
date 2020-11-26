@@ -1,6 +1,7 @@
 import openpyxl
 from pycel import ExcelCompiler
-from excelfee.models import InputData, CalcResult, ExcelFile, InputDataGeneric, Cell
+from excelfee.models import InputData, CalcResult, ExcelFile, InputDataGeneric, Cell, Input
+from excelfee.serializers import CellSerializer
 import os
 
 
@@ -30,6 +31,26 @@ class ExcelHandler:
     def _get_value(self, sheet: str, cell: str):
         excel = ExcelCompiler(excel=self.book)
         return excel.evaluate(f'{sheet}!{cell}')
+
+    def calculate(self, data: Input,
+                  excel: ExcelFile) -> InputDataGeneric:
+        try:
+            for cell in data.input:
+                # cell = Cell(**d)
+                self._set_value(cell.sheet, cell.cell, cell.value)
+
+            result = InputDataGeneric()
+            cells = []
+            for cell in data.output:
+                # cell = Cell(**d)
+                cell.value = self._get_value(cell.sheet, cell.cell)
+                cells.append(cell)
+            result.cells = cells
+            result.filename = excel.filename
+        except Exception as e:
+            raise e
+
+        return result
 
     def calculate_fee(self, input_data: InputData, excel: ExcelFile) -> CalcResult:
         try:
@@ -94,4 +115,3 @@ class ExcelHandler:
             result[sheet_name] = cells
 
         return result
-

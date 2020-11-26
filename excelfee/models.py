@@ -86,6 +86,16 @@ class Cell(models.Model, models.Field):
     def value(self):
         return self.value_text if self.value_type == 'T' else self.value_numeric
 
+    @value.setter
+    def value(self, value):
+        self.value_numeric = 0
+        self.value_text = ''
+
+        if self.value_type == 'T':
+            self.value_text = value
+        else:
+            self.value_numeric = value
+
 
 class InputDataGeneric(models.Model):
     class Meta:
@@ -94,7 +104,21 @@ class InputDataGeneric(models.Model):
     filename = models.CharField(name="filename",
                                 help_text='Excel filename to use for calculation',
                                 max_length=255)
-    cells = Cell('cell')
+    cells = [Cell('cell')]
+    # cells = [models.ForeignKey(Cell, on_delete=models.CASCADE, related_name='cell')]
+
+
+class Input(models.Model):
+    class Meta:
+        managed = False
+
+    filename = models.CharField(name="filename",
+                                help_text='Excel filename to use for calculation',
+                                max_length=255)
+
+    input = [models.ForeignKey(Cell, on_delete=models.CASCADE, related_name='input')]
+    output = [models.ForeignKey(Cell, on_delete=models.CASCADE, related_name='output')]
+
 
 
 class CalcResult(models.Model):
