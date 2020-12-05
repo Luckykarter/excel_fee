@@ -28,7 +28,6 @@ DEBUG = True
 ALLOWED_HOSTS = ["*"]
 
 
-
 # Application definition
 
 INSTALLED_APPS = [
@@ -44,9 +43,14 @@ INSTALLED_APPS = [
     'drf_yasg',
     "test_autogen.apps.TestAutogenConfig",
     'excelfee.apps.ExcelfeeConfig',
+    'warehouse.apps.WarehouseConfig'
 ]
 
-REST_FRAMEWORK = { 'DEFAULT_SCHEMA_CLASS': 'rest_framework.schemas.coreapi.AutoSchema' }
+REST_FRAMEWORK = { 'DEFAULT_SCHEMA_CLASS': 'rest_framework.schemas.coreapi.AutoSchema',
+                   'DEFAULT_PERMISSION_CLASSES': [
+                       'rest_framework.permissions.IsAuthenticated',
+                   ]
+                   }
 
 SWAGGER_SETTINGS = {
     'DEFAULT_AUTO_SCHEMA_CLASS': 'drf_yasg_examples.SwaggerAutoSchema',
@@ -54,6 +58,7 @@ SWAGGER_SETTINGS = {
 
 
 MIDDLEWARE = [
+    'django.middleware.csrf.CsrfViewMiddleware',
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -62,8 +67,11 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     'corsheaders.middleware.CorsMiddleware',
-    'django.middleware.common.CommonMiddleware'
+    'django.middleware.common.CommonMiddleware',
+
 ]
+
+MIDDLEWARE_CLASSES = ('death_star.urls.AuthRequiredMiddleware')
 
 ROOT_URLCONF = "death_star.urls"
 
@@ -133,7 +141,7 @@ AUTH_PASSWORD_VALIDATORS = [
     {
         "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",
     },
-    {"NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",},
+    # {"NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",},
     {"NAME": "django.contrib.auth.password_validation.CommonPasswordValidator",},
     {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator",},
 ]
@@ -157,6 +165,13 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
 
 STATIC_URL = "/static/"
+
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+
+# STATICFILES_DIRS = [
+#     os.path.join(BASE_DIR, "static"),
+# ]
+
 
 
 GCP = {

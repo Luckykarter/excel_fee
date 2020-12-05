@@ -9,20 +9,24 @@ class ExcelPurposeSerializer(ModelSerializer):
         exclude = ['id']
 
 
-class CellSerializer(ModelSerializer):
+class CellPointerSerializer(ModelSerializer):
     # purpose = ExcelPurposeSerializer()
 
+    class Meta:
+        model = models.CellPointer
+        fields = '__all__'
+
+
+class CellSerializer(ModelSerializer):
     class Meta:
         model = models.Cell
         fields = '__all__'
 
 
 class LoadExcelSerializer(ModelSerializer):
-    purpose = ExcelPurposeSerializer()
-
     class Meta:
         model = models.ExcelFile
-        fields = ['purpose', 'filename', 'content']
+        fields = ['id', 'content']
 
 
 class ExcelSerializer(ModelSerializer):
@@ -30,33 +34,25 @@ class ExcelSerializer(ModelSerializer):
 
     class Meta:
         model = models.ExcelFile
-        fields = ['purpose', 'filename', 'version', 'timestamp', 'sheetnames']
+        fields = ['purpose', 'id', 'version', 'timestamp', 'sheetnames']
 
 
-class InputDataSerializer(ModelSerializer):
+class OutputSerializer(ModelSerializer):
     cells = CellSerializer(many=True)
 
     class Meta:
         # model = models.InputData
-        model = models.InputDataGeneric
+        model = models.Output
         fields = '__all__'
+
 
 class InputSerializer(ModelSerializer):
     input = CellSerializer(many=True)
-    output = CellSerializer(many=True)
+    output = CellPointerSerializer(many=True)
 
     class Meta:
-        # model = models.InputData
         model = models.Input
         fields = '__all__'
-
-# class OutputSerializer(ModelSerializer):
-#     cells = CellSerializer(many=True)
-#
-#     class Meta:
-#         # model = models.InputData
-#         model = models.Output
-#         fields = '__all__'
 
 
 class CalcResultSerializer(ModelSerializer):

@@ -3,21 +3,10 @@ from django.db import models
 import os
 
 
-class InputData(models.Model):
+class ExcelPurpose(models.Model):
     class Meta:
         managed = False
 
-    startdate = models.DateField(name="startdate",
-                                 help_text="Start Date for fee calculation\nformat: YYYY-MM-DD")
-
-    rate = models.FloatField(name="rate",
-                             help_text="Fee Rate", )
-
-    amount = models.FloatField(name="amount",
-                               help_text="Risk amount - fee calculation base")
-
-
-class ExcelPurpose(models.Model):
     PURPOSES = {
         'F': 'Fee calculation'
     }
@@ -37,11 +26,13 @@ class ExcelPurpose(models.Model):
 
 
 class ExcelFile(models.Model):
-    id = models.IntegerField(name='id', primary_key=True)
+    class Meta:
+        managed = False
 
-    filename = models.CharField(name="filename",
-                                help_text="Name of the Excel file",
-                                max_length=255)
+    id = models.CharField(name="id",
+                          help_text='Excel filename to use for calculation',
+                          max_length=255, primary_key=True)
+
     version = models.IntegerField(name="version", auto_created=True, default=1,
                                   help_text="Sequential number of the Excel file loaded for the same purpose")
 
@@ -67,6 +58,14 @@ class ExcelFile(models.Model):
 
     def __str__(self):
         return self.get_filename()
+
+
+class CellPointer(models.Model, models.Field):
+    class Meta:
+        managed = False
+
+    sheet = models.TextField(name='sheet', help_text='Name of the Excel sheet to work with')
+    cell = models.TextField(name='cell', help_text='Cell coordinates (e.g. A1, B2, etc)')
 
 
 class Cell(models.Model, models.Field):
@@ -97,13 +96,13 @@ class Cell(models.Model, models.Field):
             self.value_numeric = value
 
 
-class InputDataGeneric(models.Model):
+class Output(models.Model):
     class Meta:
         managed = False
 
-    filename = models.CharField(name="filename",
-                                help_text='Excel filename to use for calculation',
-                                max_length=255)
+    id = models.CharField(name="id",
+                          help_text='Excel filename to use for calculation',
+                          max_length=255, primary_key=True)
     cells = [Cell('cell')]
     # cells = [models.ForeignKey(Cell, on_delete=models.CASCADE, related_name='cell')]
 
@@ -112,13 +111,12 @@ class Input(models.Model):
     class Meta:
         managed = False
 
-    filename = models.CharField(name="filename",
-                                help_text='Excel filename to use for calculation',
-                                max_length=255)
+    id = models.CharField(name="id",
+                          help_text='Excel filename to use for calculation',
+                          max_length=255, primary_key=True)
 
-    input = [models.ForeignKey(Cell, on_delete=models.CASCADE, related_name='input')]
-    output = [models.ForeignKey(Cell, on_delete=models.CASCADE, related_name='output')]
-
+    input = [models.ForeignKey(Cell, on_delete=models.DO_NOTHING, related_name='input')]
+    output = [models.ForeignKey(CellPointer, on_delete=models.DO_NOTHING, related_name='output')]
 
 
 class CalcResult(models.Model):
@@ -132,5 +130,5 @@ class CalcResult(models.Model):
                                    help_text="Describes details of fee calculation",
                                    max_length=1024)
 
-    excel = models.ForeignKey(ExcelFile, on_delete=models.CASCADE,
+    excel = models.ForeignKey(ExcelFile, on_delete=models.DO_NOTHING,
                               help_text='File used for calculation')
