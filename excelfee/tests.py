@@ -12,5 +12,10 @@ def test_excel():
     handler._set_value('Integration', 'B4', 0.01)
     print(handler._get_value('Integration', 'F3'))
     print(handler._get_value('Integration', 'F4'))
+    content = handler._get_file_content()
+
+    with open("C:\\Users\\egorw\\PycharmProjects\\doka\\excelfee\\data\\tst.txt", 'w+') as b:
+        b.write(content)
+
     assert True
 

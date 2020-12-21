@@ -41,7 +41,7 @@ INSTALLED_APPS = [
     # "apisure_guarantee.apps.GuaranteeConfig",
     # "corsheaders",
     'drf_yasg',
-    "test_autogen.apps.TestAutogenConfig",
+    # "test_autogen.apps.TestAutogenConfig",
     'excelfee.apps.ExcelfeeConfig',
     'warehouse.apps.WarehouseConfig'
 ]
@@ -77,17 +77,17 @@ ROOT_URLCONF = "death_star.urls"
 
 CORS_ALLOW_ALL_ORIGINS = True
 
-# CORS_ALLOW_HEADERS = [
-#     'accept',
-#     'accept-encoding',
-#     'authorization',
-#     'content-type',
-#     'dnt',
-#     'origin',
-#     'user-agent',
-#     'x-csrftoken',
-#     'x-requested-with',
-# ]
+CORS_ALLOW_HEADERS = [
+    'accept',
+    'accept-encoding',
+    'authorization',
+    'content-type',
+    'dnt',
+    'origin',
+    'user-agent',
+    'x-csrftoken',
+    'x-requested-with',
+]
 
 
 TEMPLATES = [
@@ -119,20 +119,6 @@ DATABASES = {
     }
 
 }
-
-# DATABASES = {
-#    'default': {
-#        'ENGINE': "django_pyodbc",
-#        'HOST': "localhost",
-#        'USER': "DNG200",
-#        'PASSWORD': "dng200",
-#        'NAME': "DNG200",
-#        'OPTIONS': {
-#            'host_is_server': True
-#        },
-#    }
-# }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/3.0/ref/settings/#auth-password-validators

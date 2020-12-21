@@ -107,6 +107,16 @@ class Output(models.Model):
     # cells = [models.ForeignKey(Cell, on_delete=models.CASCADE, related_name='cell')]
 
 
+class OutputFile(models.Model):
+    class Meta:
+        managed = False
+
+    id = models.CharField(name="id",
+                          help_text='Excel filename to use for calculation',
+                          max_length=255, primary_key=True)
+    content = models.TextField(name="content", help_text="Base64 encoded Excel file")
+
+
 class Input(models.Model):
     class Meta:
         managed = False
@@ -118,6 +128,15 @@ class Input(models.Model):
     input = [models.ForeignKey(Cell, on_delete=models.DO_NOTHING, related_name='input')]
     output = [models.ForeignKey(CellPointer, on_delete=models.DO_NOTHING, related_name='output')]
 
+class InputFile(models.Model):
+    class Meta:
+        managed = False
+
+    id = models.CharField(name="id",
+                          help_text='Excel filename to use for calculation',
+                          max_length=255, primary_key=True)
+
+    input = [models.ForeignKey(Cell, on_delete=models.DO_NOTHING, related_name='input')]
 
 class CalcResult(models.Model):
     class Meta:

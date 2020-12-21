@@ -1,38 +1,54 @@
 import openpyxl
 from pycel import ExcelCompiler
-from excelfee.models import Output, Input
-from excelfee.serializers import CellSerializer
+from excelfee.models import Output, Input, OutputFile
 import os
+import base64
 
 
 class ExcelHandler:
     BASE_PATH = os.path.dirname(os.path.abspath(__file__))
+    TEMP_FILE = os.path.join(BASE_PATH, "temp.xlsx")
 
     def __init__(self, file):
         self.book = openpyxl.load_workbook(file)
         self.excel = ExcelCompiler(excel=self.book)
 
     def _set_value(self, sheet: str, cell: str, value: any):
-        self.book.worksheets[self.book.sheetnames.index(sheet)][cell] = value
+        sheet_idx = 0 if not sheet else self.book.sheetnames.index(sheet)
+        self.book.worksheets[sheet_idx][cell] = value
 
     def _get_value(self, sheet: str, cell: str):
         return self.excel.evaluate(f'{sheet}!{cell}')
 
+    def _get_file_content(self):
+        self.book.save(ExcelHandler.TEMP_FILE)
+        with open(ExcelHandler.TEMP_FILE, "rb") as excel_file:
+            content = base64.b64encode(excel_file.read())
+            content = content.decode('utf-8')
+        os.remove(ExcelHandler.TEMP_FILE)
+
+        return content
+
     def calculate(self, data: Input,
-                  excel_id: str) -> Output:
+                  excel_id: str, output_type='cells'):
+        result = None
         try:
             for cell in data.input:
-                # cell = Cell(**d)
                 self._set_value(cell.sheet, cell.cell, cell.value)
 
-            result = Output()
             cells = []
-            self.excel = ExcelCompiler(excel=self.book)
-            for cell in data.output:
-                cell.value = self._get_value(cell.sheet, cell.cell)
-                cells.append(cell)
-            result.cells = cells
-            result.filename = excel_id
+            if output_type == 'cells':
+                self.excel = ExcelCompiler(excel=self.book)
+                result = Output()
+                for cell in data.output:
+                    cell.value = self._get_value(cell.sheet, cell.cell)
+                    cells.append(cell)
+                result.cells = cells
+                result.filename = excel_id
+            elif output_type == 'file':
+                result = OutputFile()
+                result.content = self._get_file_content()
+
         except Exception as e:
             raise e
 

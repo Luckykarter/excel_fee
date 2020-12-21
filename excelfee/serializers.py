@@ -81,3 +81,17 @@ class ErrorSerializer(serializers.Serializer):
 
 class PropertySerializer(serializers.Serializer):
     property_name = serializers.StringRelatedField(many=True)
+
+
+class OutputFileSerializer(ModelSerializer):
+    class Meta:
+        model = models.OutputFile
+        fields = '__all__'
+
+
+class InputFileSerializer(ModelSerializer):
+    input = CellSerializer(many=True)
+
+    class Meta:
+        model = models.InputFile
+        fields = '__all__'
